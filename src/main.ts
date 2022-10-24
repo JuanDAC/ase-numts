@@ -415,25 +415,22 @@ NumTS.findDeterminant = (data: NumTsMatrix[]): number => {
     const timepass: never[] = [];
     let ans = 0;
     let sign = 1;
-    for (const i in toOperate as number[]) {
-      // starting j from one since at zero toOperate data is there
-      const newData = [];
+    (toOperate as number[])?.forEach((_, i) => {
+      const newData: NumTsMatrix = [];
       let tig = -1;
       for (let j = 1; j < data.length; j++) {
-        const temp = [];
+        const temp: NumTsMatrix = [];
         let counter = -1;
         const yak = data[j];
-        for (const v in yak as NumTsMatrix[]) {
-          if (v != i) {
-            temp[++counter] = (yak as number[][])[v] as number[];
-          }
-        }
+        (yak as number[][])?.forEach((_, v) => {
+          temp[++counter] = (yak as number[][])[v] as number[];
+        });
         newData[++tig] = temp;
       }
       ans = ans + sign * ((toOperate as number[])[i] as number) * nCrossNDeterminant(newData as NumTsMatrix[]);
       sign = sign * -1;
       (timepass as NumTsMatrix[])[i] = newData;
-    }
+    });
     return ans;
   }
 
@@ -452,9 +449,9 @@ NumTS.findDeterminant = (data: NumTsMatrix[]): number => {
       if (NumTS.isSquare(innerData as NumTsMatrix[])) {
         res[++counter] = nCrossNDeterminant(innerData);
       } else {
-        for (const i in innerData) {
+        innerData.forEach((_, i) => {
           innerDeterminant(innerData[i] as NumTsMatrix[]);
-        }
+        });
       }
     };
 
@@ -510,7 +507,7 @@ NumTS.findAdjoint = (data: NumTsMatrix[]) => {
   const ansToSave: NumTsMatrix[] = [];
   let sign = 1;
 
-  for (const k in data) {
+  data.forEach((_, k) => {
     const toOperate = deepCopy(data[k]);
     for (const i in toOperate) {
       sign = Math.pow(-1, Number(k) + Number(i));
@@ -518,21 +515,21 @@ NumTS.findAdjoint = (data: NumTsMatrix[]) => {
       let tig = -1;
       for (let j = 0; j < data.length; j++) {
         if (j !== (k as unknown as number)) {
-          const temp = [];
+          const temp: NumTsMatrix[] = [];
           let counter = -1;
           const yak = data[j] as NumTsMatrix[];
-          for (const v in yak) {
-            if (v != i) {
+          yak.forEach((_, v) => {
+            if (v != (i as unknown as number)) {
               temp[++counter] = yak[v];
             }
-          }
+          });
           newData[++tig] = temp;
         }
       }
       toOperate[i] = sign * (NumTS.findDeterminant(newData as NumTsMatrix[]) as number);
     }
     ansToSave[k] = toOperate;
-  }
+  });
   return NumTS.T(ansToSave);
 };
 
@@ -610,25 +607,25 @@ NumTS.matrixMultiply = (firstMatrix: NumTsMatrix[], secondMatrix: NumTsMatrix[])
       if (NumTS.shape(firstMatrix).length == 2) {
         res[++counter] = findMatrixMultiply(firstMatrix, secondMatrix);
       } else {
-        for (const j in firstMatrix) {
+        secondMatrix.forEach((_, j) => {
           innerMatrixMultiply(firstMatrix[j] as NumTsMatrix[], secondMatrix, shuffle, res);
-        }
+        });
       }
     } else if (shuffle == true) {
       if (NumTS.shape(secondMatrix).length == 2) {
         res[++counter] = findMatrixMultiply(firstMatrix, secondMatrix);
       } else {
-        for (const j in secondMatrix) {
+        secondMatrix.forEach((_, j) => {
           innerMatrixMultiply(firstMatrix, secondMatrix[j] as NumTsMatrix[], shuffle, res);
-        }
+        });
       }
     } else if (shuffle == 'allSame') {
       if (NumTS.shape(secondMatrix).length == 2) {
         res[++counter] = findMatrixMultiply(firstMatrix, secondMatrix);
       } else {
-        for (const j in secondMatrix) {
+        secondMatrix.forEach((_, j) => {
           innerMatrixMultiply(firstMatrix[j] as NumTsMatrix[], secondMatrix[j] as NumTsMatrix[], shuffle, res);
-        }
+        });
       }
     } else {
       print(`ERROR: The input ndArray has improper shapes`);
@@ -841,13 +838,13 @@ NumTS.is_first_greater = (first_array: NumTsMatrix[], second_array: NumTsMatrix[
   if (first_array_dimension.length > second_array_dimension.length) {
     return true;
   } else if (first_array_dimension.length == second_array_dimension.length) {
-    for (const j in first_array_dimension) {
+    first_array_dimension.forEach((_, j) => {
       if (second_array_dimension[j] < first_array_dimension[j]) {
         return true;
       } else if (second_array_dimension[j] > first_array_dimension[j]) {
         return false;
       }
-    }
+    });
     return true;
   } else {
     return false;
@@ -870,9 +867,9 @@ NumTS.findHighestElement = (data: NumTsMatrix[]): number => {
     return findHighest(data);
   } else {
     const max: NumTsMatrix[] = [];
-    for (const i in data) {
+    data.forEach((_, i) => {
       max[i] = NumTS.findHighestElement(data[i] as NumTsMatrix[]);
-    }
+    });
     return findHighest(max as NumTsMatrix[]);
   }
 };
@@ -891,9 +888,9 @@ NumTS.findLowestElement = (data: NumTsMatrix[]) => {
     return findLowest(data);
   } else {
     const max: NumTsMatrix[] = [];
-    for (const i in data) {
+    data.forEach((_, i) => {
       max[i] = NumTS.findLowestElement(data[i] as NumTsMatrix[]);
-    }
+    });
     return findLowest(max);
   }
 };
@@ -902,10 +899,10 @@ NumTS.findSquare = (data: NumTsMatrix[]) => {
   function inner_findSquare(inner_data: NumTsMatrix[]) {
     if (typeof inner_data == 'number') {
       return inner_data * inner_data;
-    } else if (typeof inner_data == 'object') {
-      for (const i in inner_data) {
+    } else {
+      data.forEach((_, i) => {
         inner_data[i] = inner_findSquare(inner_data[i] as NumTsMatrix[]);
-      }
+      });
     }
     return inner_data;
   }
@@ -922,9 +919,10 @@ NumTS.findTotalElements = (data: NumTsMatrix[]): number => {
     return data.length;
   }
   let sum = 0;
-  for (const i in data) {
+
+  data.forEach((_, i) => {
     sum = sum + NumTS.findTotalElements(data[i] as NumTsMatrix[]);
-  }
+  });
   return sum;
 };
 
@@ -942,9 +940,9 @@ NumTS.findSum = (data: NumTsMatrix[]): number => {
     return data;
   }
   let sum = 0;
-  for (const i in data) {
+  data.forEach((_, i) => {
     sum = (sum + NumTS.findSum(data[i] as NumTsMatrix[])) as number;
-  }
+  });
   return sum;
 };
 
@@ -957,7 +955,7 @@ NumTS.findMedian = (data: NumTsMatrix[]) => {
 
   const half = Math.floor(values.length / 2);
 
-  if (values.length % 2) return values[half];
+  if (values.length % 2 !== 0) return values[half];
   else return (values[half - 1] + values[half]) / 2.0;
 };
 
@@ -970,20 +968,18 @@ NumTS.findFrequency = (data: NumTsMatrix[], tofind: number): number => {
     }
   }
   let sum = 0;
-  for (const i in data) {
-    sum = sum + NumTS.findFrequency(data[i] as NumTsMatrix[], tofind);
-  }
+  data.forEach((_, i) => (sum = sum + NumTS.findFrequency(data[i] as NumTsMatrix[], tofind)));
   return sum;
 };
 
 NumTS.executeOnTwoArray = (data_array: NumTsMatrix[], to_operation: NumTsMatrix[], task_to_perform: (a: number, b: number) => number) => {
-  for (const i in data_array) {
+  data_array.forEach((_, i) => {
     if (typeof data_array[i] === 'number') {
       data_array[i] = task_to_perform(data_array[i] as number, to_operation[i] as number);
     } else {
       NumTS.executeOnTwoArray(data_array[i] as NumTsMatrix[], to_operation[i] as number[], task_to_perform);
     }
-  }
+  });
 
   return data_array;
 };
@@ -993,13 +989,13 @@ NumTS.executeOnNumberAndArray = (
   to_operation: NumTsMatrix[],
   task_to_perform: (a: number, b: number) => number
 ) => {
-  for (const i in data_array) {
+  data_array.forEach((_, i) => {
     if (typeof data_array[i] == 'object') {
       data_array[i] = NumTS.executeOnNumberAndArray(data_array[i] as NumTsMatrix[], to_operation, task_to_perform);
     } else {
       data_array[i] = task_to_perform(data_array[i] as number, to_operation[0] as number);
     }
-  }
+  });
 
   return data_array;
 };
@@ -1007,25 +1003,27 @@ NumTS.executeOnNumberAndArray = (
 NumTS.executeOnNonEqualArray = (
   data_array: NumTsMatrix[],
   to_operation: NumTsMatrix[],
-  task_to_perform: (a: number, b: number) => number
+  task_to_perform: (a: number, b: number) => number,
+  res: any[]
 ) => {
   const data_dimension = NumTS.shape(data_array);
   const to_operation_dimension = NumTS.shape(to_operation);
   const subset_data_dimension = data_dimension.slice(data_dimension.length - to_operation_dimension.length);
 
   function isInnerDimensionSame() {
-    for (const i in to_operation_dimension) {
+    to_operation_dimension.forEach((_, i) => {
       if (to_operation_dimension[i] != subset_data_dimension[i]) {
         return false;
       }
-    }
+    });
     return true;
   }
 
   if (isInnerDimensionSame()) {
-    /*  TODO:   
-    res = executeOnInnerDimensions(data_array, to_operation, data_array.slice(), 0, task_to_perform); 
-    */
+    res.forEach(() => res.pop());
+    NumTS.executeOnInnerDimensions(data_array, to_operation, data_array.slice(), 0, task_to_perform).forEach((value) => {
+      res.push(value);
+    });
   } else {
     if (data_dimension[data_dimension.length - 2] == to_operation_dimension[0]) {
       NumTS.executeOnColumns(data_array, to_operation, 0, task_to_perform);
@@ -1047,27 +1045,18 @@ NumTS.executeOnColumns = (
   if (typeof data_array[0] == 'number') {
     data_array = NumTS.executeOnNumberAndArray(data_array, to_operation[i] as NumTsMatrix[], task_to_perform);
   } else if (Array.isArray(data_array[i])) {
-    for (const y in data_array) {
-      NumTS.executeOnColumns(data_array[y] as NumTsMatrix[], to_operation, y as unknown as number, task_to_perform);
-    }
+    data_array.forEach((_, y) =>
+      NumTS.executeOnColumns(data_array[y] as NumTsMatrix[], to_operation, y as unknown as number, task_to_perform)
+    );
   }
 };
 
 NumTS.executeOnRow = (data_array: NumTsMatrix[], to_operation: NumTsMatrix[], i = 0, task_to_perform: (a: number, b: number) => number) => {
   // if (miscellaneousOperations.get_Dimensions(data_array).length == 2 && miscellaneousOperations.get_Dimensions(data_array)[0] == 1) {
   if (NumTS.isSingleArray(data_array)) {
-    /**
-     * Here we cannot use executeOnNumberAndArray since
-     * we want to add a number to a element and not
-     * a number to and array
-     */
-    for (const j in data_array) {
-      data_array[j] = task_to_perform(data_array[j] as number, to_operation[j] as number);
-    }
+    data_array.forEach((_, j) => (data_array[j] = task_to_perform(data_array[j] as number, to_operation[j] as number)));
   } else {
-    for (const k in data_array) {
-      NumTS.executeOnRow(data_array[k] as NumTsMatrix[], to_operation, k as unknown as number, task_to_perform);
-    }
+    data_array.forEach((_, k) => NumTS.executeOnRow(data_array[k] as NumTsMatrix[], to_operation, k as unknown as number, task_to_perform));
   }
 };
 
@@ -1086,7 +1075,7 @@ NumTS.executeOnInnerDimensions = (
     if (NumTS.all_dimensions_same(data_array, to_operation)) {
       to_store[i] = NumTS.executeOnTwoArray(data_array, to_operation, task_to_perform);
     } else {
-      for (const j in data_array) {
+      data_array.forEach((_, j) => {
         NumTS.executeOnInnerDimensions(
           data_array[j] as NumTsMatrix[],
           to_operation,
@@ -1094,20 +1083,25 @@ NumTS.executeOnInnerDimensions = (
           j as unknown as number,
           task_to_perform
         );
-      }
+      });
     }
   }
   return to_store;
 };
 
-NumTS.innerExecute = (data_array: NumTsMatrix[], to_operation: NumTsMatrix[], task_to_perform: (a: number, b: number) => number) => {
+NumTS.innerExecute = (
+  data_array: NumTsMatrix[],
+  to_operation: NumTsMatrix[],
+  task_to_perform: (a: number, b: number) => number,
+  res: any[]
+) => {
   if (NumTS.hasSingleItem(to_operation)) {
     return NumTS.executeOnNumberAndArray(data_array, to_operation, task_to_perform);
   } else if (typeof to_operation == 'object') {
     if (NumTS.all_dimensions_same(data_array, to_operation)) {
       return NumTS.executeOnTwoArray(data_array, to_operation, task_to_perform);
     } else {
-      return NumTS.executeOnNonEqualArray(data_array, to_operation, task_to_perform);
+      return NumTS.executeOnNonEqualArray(data_array, to_operation, task_to_perform, res);
     }
   }
   return data_array;
@@ -1129,7 +1123,7 @@ NumTS.mainExecute = (
     to_operation = [];
     to_operation[0] = temp;
   }
-  let res = [];
+  let res: any[] = [];
   let safety = [];
 
   function get_toStore_object(data: NumTsMatrix[], replace: boolean) {
@@ -1144,10 +1138,10 @@ NumTS.mainExecute = (
 
   if (NumTS.is_first_greater(data_array, to_operation)) {
     safety = get_toStore_object(data_array, replace);
-    res = NumTS.innerExecute(safety, to_operation, task_to_perform(false));
+    res = NumTS.innerExecute(safety, to_operation, task_to_perform(false), res);
   } else {
     safety = get_toStore_object(to_operation, replace);
-    res = NumTS.innerExecute(safety, data_array, task_to_perform(true));
+    res = NumTS.innerExecute(safety, data_array, task_to_perform(true), res);
   }
   return res;
 };
@@ -1198,9 +1192,10 @@ NumTS.nThRoot = (data: NumTsMatrix[], raiseTo: NumTsMatrix) => {
     if (typeof raiseTo == 'number') {
       return 1 / raiseTo;
     }
-    for (const j in raiseTo) {
+
+    raiseTo.forEach((_, j) => {
       raiseTo[j] = innerNThRoot(raiseTo[j]);
-    }
+    });
     return raiseTo as unknown as number;
   }
 
@@ -1221,14 +1216,14 @@ function getBaseLog(x: number, y: number) {
 
 NumTS.log10 = (a: NumTsMatrix[] | NumTsMatrix, replace = false) => {
   const inner_log = (_: boolean) => (a: number, b: number) => {
-    return Number(getBaseLog(b, a).toFixed(8));
+    return Number(getBaseLog(b, a));
   };
   return NumTS.mainExecute(a as NumTsMatrix[], 10 as unknown as NumTsMatrix[], replace, inner_log);
 };
 
 NumTS.logE = (a: NumTsMatrix[] | NumTsMatrix, replace = false) => {
   const inner_log = (_: boolean) => (a: number, b: number) => {
-    return Number(getBaseLog(b, a).toFixed(8));
+    return Number(getBaseLog(b, a));
   };
   return NumTS.mainExecute(a as NumTsMatrix[], 2.718281828459045 as unknown as NumTsMatrix[], replace, inner_log);
 };
@@ -1236,9 +1231,9 @@ NumTS.logE = (a: NumTsMatrix[] | NumTsMatrix, replace = false) => {
 NumTS.log = (a: NumTsMatrix[] | NumTsMatrix, b: NumTsMatrix[] | NumTsMatrix, replace = false) => {
   const inner_log = (shuffle: boolean) => (a: number, b: number) => {
     if (shuffle) {
-      return Number(getBaseLog(a, b).toFixed(8));
+      return Number(getBaseLog(a, b));
     } else {
-      return Number(getBaseLog(b, a).toFixed(8));
+      return Number(getBaseLog(b, a));
     }
   };
   return NumTS.mainExecute(a as NumTsMatrix[], b as NumTsMatrix[], replace, inner_log);
@@ -1291,7 +1286,7 @@ NumTS.findSampleVariance = (data: NumTsMatrix[]) => {
 NumTS.findAllFrequency = (data: NumTsMatrix[]) => {
   function inner_findAllFrequency(wholeData: NumTsMatrix[], data: NumTsMatrix[], ans = {}) {
     // var ans = {};
-    for (const i in data) {
+    data.forEach((_, i) => {
       if (typeof data[i] == 'number') {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -1299,7 +1294,7 @@ NumTS.findAllFrequency = (data: NumTsMatrix[]) => {
       } else {
         inner_findAllFrequency(wholeData, data[i] as NumTsMatrix[], ans);
       }
-    }
+    });
   }
   const ans = {};
   inner_findAllFrequency(data, data, ans);

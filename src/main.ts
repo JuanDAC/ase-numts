@@ -298,34 +298,44 @@ NumTS.reshape = (array: NumTsMatrix[], shape: number[], type: 'C' | 'F' | 'T' = 
   return NumTS.vector2matriz(arrayFlatLikeFortran, shape);
 };
 
-NumTS.prod = (array: NumTsMatrix[], { axis = 0, initial = 1, where = [], flat = true }: ProdProps = {}): NumTsMatrix => {
-  if (axis < 0) {
-    print(`ERROR: Axis cannot be negative. Current Axis is ${axis} in NumTS.prod`);
-    debug.traceback(`ERROR: Axis cannot be negative. Current Axis is ${axis} in NumTS.prod`);
-    return [];
-  }
+const reductionOperation =
+  (operation: (this: any, acum: number, val: number) => number) =>
+  (array: NumTsMatrix[], { axis = 0, initial = 1, where = [], flat = true }: ProdProps = {}): NumTsMatrix => {
+    if (axis < 0) {
+      print(`ERROR: Axis cannot be negative. Current Axis is ${axis} in NumTS.prod`);
+      debug.traceback(`ERROR: Axis cannot be negative. Current Axis is ${axis} in NumTS.prod`);
+      return [];
+    }
 
-  if ((where.length !== 0 && axis === 0, where.length !== array.length)) {
-    where = [...where, ...Array.from({ length: Math.abs(array.length - where.length) }, () => true)];
-  }
+    if ((where.length !== 0 && axis === 0, where.length !== array.length)) {
+      where = [...where, ...Array.from({ length: Math.abs(array.length - where.length) }, () => true)];
+    }
 
-  if (where.length === 0 && axis === 0) {
-    where = array?.map(() => true);
-  }
+    if (where.length === 0 && axis === 0) {
+      where = array?.map(() => true);
+    }
 
-  if (axis == 0) {
-    return (array as number[])
-      .map((value, index) => {
-        if (!where[index]) return 1;
-        if (Array.isArray(value) && !flat) return 1;
-        if (Array.isArray(value) && flat) value = NumTS.prod(value) as number;
-        return value;
-      })
-      .reduce((acum, val) => acum * val, initial) as number;
-  }
+    if (axis == 0) {
+      return (array as number[])
+        .map((value, index) => {
+          if (!where[index]) return 1;
+          if (Array.isArray(value) && !flat) return 1;
+          if (Array.isArray(value) && flat) value = NumTS.prod(value) as number;
+          return value;
+        })
+        .reduce(operation, initial) as number;
+    }
 
-  return array.map((element) => NumTS.prod(element as NumTsMatrix[], { axis: axis - 1, initial, flat, where }));
-};
+    return array.map((element) => NumTS.prod(element as NumTsMatrix[], { axis: axis - 1, initial, flat, where }));
+  };
+
+NumTS.prod = reductionOperation((acum, val) => acum * val);
+
+NumTS.sum = reductionOperation((acum, val) => acum + val);
+
+NumTS.diference = reductionOperation((acum, val) => acum - val);
+
+NumTS.divition = reductionOperation((acum, val) => acum / val);
 
 NumTS.getColumns = (array: NumTsMatrix[], index = 0): NumTsMatrix[] => {
   const newData = [] as NumTsMatrix[];

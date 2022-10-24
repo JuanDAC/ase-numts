@@ -299,8 +299,8 @@ NumTS.reshape = (array: NumTsMatrix[], shape: number[], type: 'C' | 'F' | 'T' = 
 };
 
 const reductionOperation =
-  (operation: (this: any, acum: number, val: number) => number) =>
-  (array: NumTsMatrix[], { axis = 0, initial = 1, where = [], flat = true }: ProdProps = {}): NumTsMatrix => {
+  (operation: (this: any, acum: number, val: number) => number, init = 0) =>
+  (array: NumTsMatrix[], { axis = 0, initial = init, where = [], flat = true }: ProdProps = {}): NumTsMatrix => {
     if (axis < 0) {
       print(`ERROR: Axis cannot be negative. Current Axis is ${axis} in NumTS.prod`);
       debug.traceback(`ERROR: Axis cannot be negative. Current Axis is ${axis} in NumTS.prod`);
@@ -329,13 +329,13 @@ const reductionOperation =
     return array.map((element) => NumTS.prod(element as NumTsMatrix[], { axis: axis - 1, initial, flat, where }));
   };
 
-NumTS.prod = reductionOperation((acum, val) => acum * val);
+NumTS.prod = reductionOperation((acum, val) => acum * val, 1);
 
 NumTS.sum = reductionOperation((acum, val) => acum + val);
 
 NumTS.diference = reductionOperation((acum, val) => acum - val);
 
-NumTS.divition = reductionOperation((acum, val) => acum / val);
+NumTS.divition = reductionOperation((acum, val) => acum / val, 1);
 
 NumTS.getColumns = (array: NumTsMatrix[], index = 0): NumTsMatrix[] => {
   const newData = [] as NumTsMatrix[];

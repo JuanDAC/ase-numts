@@ -1,0 +1,16 @@
+{
+  "information": {
+    "alias": "aseNumTS",
+    "name": "ase-numts",
+    "description": "is the fundamental package for scientific computing in typescript for use to export lua language for solver probles arround operations on arrays, including mathematical, logical, shape manipulation, sorting, selecting, I/O, discrete Fourier transforms, basic linear algebra, basic statistical operations and more in aseprite",
+    "license": "GNU General Public License v3.0",
+    "author:name": "JuanDAC",
+    "author:email": "juanavila12.0308@gmail.com",
+    "author:url": "https://www.linkedin.com/in/juandac/",
+    "github": "https://github.com/JuanDAC"
+  },
+  "template": "juandac/ase-template-script",
+  "dependencies": [
+    "juandac/ase-deep-copy"
+  ]
+}
